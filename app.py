@@ -5,7 +5,7 @@ import requests
 # =============================================
 # ENTER YOUR API KEY HERE
 # =============================================
-OPENAI_API_KEY = ""  # Replace with your actual OpenAI API key
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]  # Replace with your actual OpenAI API key
 # =============================================
 
 # Page configuration
