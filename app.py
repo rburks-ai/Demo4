@@ -3,6 +3,12 @@ import anthropic
 import requests
 from datetime import datetime, timedelta
 
+# =============================================
+# ENTER YOUR API KEY HERE
+# =============================================
+CLAUDE_API_KEY = "sk-ant-your-api-key-here"  # Replace with your actual API key
+# =============================================
+
 # Page configuration
 st.set_page_config(
     page_title="Real Estate Q&A with Claude",
@@ -26,18 +32,9 @@ st.markdown("""
 st.title("🏠 Real Estate Q&A with Claude")
 st.markdown("*Powered by Claude AI with weather information for home tours*")
 
-# Sidebar for API keys and settings
+# Sidebar for weather and settings
 with st.sidebar:
     st.header("⚙️ Settings")
-    
-    # Claude API Key
-    api_key = st.text_input(
-        "Claude API Key",
-        type="password",
-        help="Get your API key from console.anthropic.com"
-    )
-    
-    st.divider()
     
     # Weather section
     st.header("🌤️ Weather for Home Tours")
@@ -51,8 +48,7 @@ with st.sidebar:
     if st.button("Check Weather", type="primary"):
         if city:
             try:
-                # Using OpenWeatherMap API (free tier, no key required for current weather)
-                # You can also use wttr.in which is completely free
+                # Using wttr.in API (completely free, no key required)
                 weather_url = f"https://wttr.in/{city}?format=j1"
                 response = requests.get(weather_url, timeout=10)
                 
@@ -94,11 +90,17 @@ with st.sidebar:
     - How does mortgage pre-approval work?
     - What are closing costs?
     - Is now a good time to buy?
+    - What's the best weather for touring homes?
     """)
 
 # Initialize session state for messages
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+# Check if API key is set
+if CLAUDE_API_KEY == "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":
+    st.error("⚠️ Please edit app.py and enter your Claude API key in the CLAUDE_API_KEY variable at the top of the file.")
+    st.stop()
 
 # Display chat messages
 for message in st.session_state.messages:
@@ -107,10 +109,6 @@ for message in st.session_state.messages:
 
 # Chat input
 if prompt := st.chat_input("Ask about real estate..."):
-    if not api_key:
-        st.error("Please enter your Claude API key in the sidebar")
-        st.stop()
-    
     # Add user message to chat
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -122,7 +120,7 @@ if prompt := st.chat_input("Ask about real estate..."):
         
         try:
             # Initialize Anthropic client
-            client = anthropic.Anthropic(api_key=api_key)
+            client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
             
             # Prepare messages for API
             api_messages = [
@@ -152,7 +150,7 @@ if prompt := st.chat_input("Ask about real estate..."):
             })
             
         except anthropic.AuthenticationError:
-            st.error("Invalid API key. Please check your Claude API key.")
+            st.error("Invalid API key. Please check your Claude API key in the code.")
         except anthropic.RateLimitError:
             st.error("Rate limit exceeded. Please wait a moment and try again.")
         except Exception as e:
@@ -162,7 +160,7 @@ if prompt := st.chat_input("Ask about real estate..."):
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #666;'>"
-    "Your API key is used only for this session and sent directly to Anthropic's API"
+    "Your API key is hardcoded in the app for easy deployment"
     "</div>",
     unsafe_allow_html=True
 )
