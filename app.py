@@ -1,12 +1,11 @@
 import streamlit as st
 import anthropic
 import requests
-from datetime import datetime, timedelta
 
 # =============================================
 # ENTER YOUR API KEY HERE
 # =============================================
-CLAUDE_API_KEY = "sk-ant-your-api-key-here"  # Replace with your actual API key
+CLAUDE_API_KEY = "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"  # Replace with your actual API key
 # =============================================
 
 # Page configuration
@@ -98,8 +97,9 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Check if API key is set
-if CLAUDE_API_KEY == "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":
+if CLAUDE_API_KEY == "sk-ant-your-api-key-here":
     st.error("⚠️ Please edit app.py and enter your Claude API key in the CLAUDE_API_KEY variable at the top of the file.")
+    st.info("Get your API key from: https://console.anthropic.com/")
     st.stop()
 
 # Display chat messages
@@ -150,9 +150,9 @@ if prompt := st.chat_input("Ask about real estate..."):
             })
             
         except anthropic.AuthenticationError:
-            st.error("Invalid API key. Please check your Claude API key in the code.")
+            st.error("❌ Invalid API key. Please check your Claude API key in the code.")
         except anthropic.RateLimitError:
-            st.error("Rate limit exceeded. Please wait a moment and try again.")
+            st.error("⏱️ Rate limit exceeded. Please wait a moment and try again.")
         except Exception as e:
             st.error(f"Error: {str(e)}")
 
@@ -160,7 +160,7 @@ if prompt := st.chat_input("Ask about real estate..."):
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #666;'>"
-    "Your API key is hardcoded in the app for easy deployment"
+    "Built with Streamlit and Claude AI"
     "</div>",
     unsafe_allow_html=True
 )
