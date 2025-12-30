@@ -1,16 +1,16 @@
 import streamlit as st
-import anthropic
+import openai
 import requests
 
 # =============================================
 # ENTER YOUR API KEY HERE
 # =============================================
-CLAUDE_API_KEY = "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"  # Replace with your actual API key
+OPENAI_API_KEY = "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"  # Replace with your actual OpenAI API key
 # =============================================
 
 # Page configuration
 st.set_page_config(
-    page_title="Real Estate Q&A with Claude",
+    page_title="Real Estate Q&A with AI",
     page_icon="🏠",
     layout="wide"
 )
@@ -28,8 +28,8 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Title and description
-st.title("🏠 Real Estate Q&A with Claude")
-st.markdown("*Powered by Claude AI with weather information for home tours*")
+st.title("🏠 Real Estate Q&A with AI")
+st.markdown("*Powered by OpenAI GPT-4 with weather information for home tours*")
 
 # Sidebar for weather and settings
 with st.sidebar:
@@ -97,10 +97,13 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Check if API key is set
-if CLAUDE_API_KEY == "sk-ant-your-api-key-here":
-    st.error("⚠️ Please edit app.py and enter your Claude API key in the CLAUDE_API_KEY variable at the top of the file.")
-    st.info("Get your API key from: https://console.anthropic.com/")
+if OPENAI_API_KEY == "sk-proj-your-api-key-here":
+    st.error("⚠️ Please edit app.py and enter your OpenAI API key in the OPENAI_API_KEY variable at the top of the file.")
+    st.info("Get your API key from: https://platform.openai.com/api-keys")
     st.stop()
+
+# Set OpenAI API key
+openai.api_key = OPENAI_API_KEY
 
 # Display chat messages
 for message in st.session_state.messages:
@@ -114,31 +117,35 @@ if prompt := st.chat_input("Ask about real estate..."):
     with st.chat_message("user"):
         st.markdown(prompt)
     
-    # Get Claude's response
+    # Get AI response
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         
         try:
-            # Initialize Anthropic client
-            client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
-            
-            # Prepare messages for API
+            # Prepare messages with system prompt
             api_messages = [
+                {
+                    "role": "system",
+                    "content": "You are a knowledgeable real estate expert. Provide helpful, accurate information about real estate topics including buying, selling, investing, market trends, financing, property management, and related subjects. Be conversational and practical in your advice. If users mention weather or touring homes, you can incorporate weather information they may have checked into your advice."
+                }
+            ] + [
                 {"role": msg["role"], "content": msg["content"]}
                 for msg in st.session_state.messages
             ]
             
-            # Create message with streaming
+            # Create streaming response
             full_response = ""
             
-            with client.messages.stream(
-                model="claude-sonnet-4-20250514",
+            stream = openai.chat.completions.create(
+                model="gpt-4o",  # Using GPT-4o (faster and cheaper than GPT-4)
+                messages=api_messages,
                 max_tokens=1024,
-                system="You are a knowledgeable real estate expert. Provide helpful, accurate information about real estate topics including buying, selling, investing, market trends, financing, property management, and related subjects. Be conversational and practical in your advice. If users mention weather or touring homes, you can incorporate weather information they may have checked into your advice.",
-                messages=api_messages
-            ) as stream:
-                for text in stream.text_stream:
-                    full_response += text
+                stream=True
+            )
+            
+            for chunk in stream:
+                if chunk.choices[0].delta.content is not None:
+                    full_response += chunk.choices[0].delta.content
                     message_placeholder.markdown(full_response + "▌")
             
             message_placeholder.markdown(full_response)
@@ -149,9 +156,11 @@ if prompt := st.chat_input("Ask about real estate..."):
                 "content": full_response
             })
             
-        except anthropic.AuthenticationError:
-            st.error("❌ Invalid API key. Please check your Claude API key in the code.")
-        except anthropic.RateLimitError:
+        except openai.AuthenticationError as e:
+            st.error("❌ Invalid API key. Please check your OpenAI API key in the code.")
+            st.error(f"Details: {str(e)}")
+            st.info("Your API key should start with 'sk-proj-' and be from platform.openai.com")
+        except openai.RateLimitError:
             st.error("⏱️ Rate limit exceeded. Please wait a moment and try again.")
         except Exception as e:
             st.error(f"Error: {str(e)}")
@@ -160,7 +169,7 @@ if prompt := st.chat_input("Ask about real estate..."):
 st.markdown("---")
 st.markdown(
     "<div style='text-align: center; color: #666;'>"
-    "Built with Streamlit and Claude AI"
+    "Built with Streamlit and OpenAI GPT-4"
     "</div>",
     unsafe_allow_html=True
 )
