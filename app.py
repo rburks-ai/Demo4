@@ -5,7 +5,7 @@ import requests
 # =============================================
 # ENTER YOUR API KEY HERE
 # =============================================
-OPENAI_API_KEY = "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"  # Replace with your actual OpenAI API key
+OPENAI_API_KEY = ""  # Replace with your actual OpenAI API key
 # =============================================
 
 # Page configuration
