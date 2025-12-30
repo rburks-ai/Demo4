@@ -5,7 +5,7 @@ import requests
 # =============================================
 # ENTER YOUR API KEY HERE
 # =============================================
-CLAUDE_API_KEY = "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"  # Replace with your actual API key
+CLAUDE_API_KEY = "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"  # Replace with your actual API key
 # =============================================
 
 # Page configuration
